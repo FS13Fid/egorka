@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secret Track 🎧</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #1f1b2e 0%, #0d0c13 100%);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 24px;
+      padding: 32px 24px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    h1, h2 {
+      font-size: 1.4rem;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    p.subtitle {
+      color: #a0a0b2;
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+      line-height: 1.4;
+    }
+
+    input[type="password"], input[type="text"] {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 14px;
+      padding: 14px 16px;
+      color: #fff;
+      font-size: 1rem;
+      text-align: center;
+      margin-bottom: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      border-color: #fc3f1d;
+    }
+
+    .btn {
+      width: 100%;
+      background: linear-gradient(135deg, #fc3f1d 0%, #ff6b3d 100%);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
+
+    /* Quiz Option Buttons */
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .opt-btn {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 14px;
+      color: #f0f0f5;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+    }
+
+    .opt-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .opt-btn.wrong {
+      background: rgba(252, 63, 29, 0.3) !important;
+      border-color: #fc3f1d !important;
+    }
+
+    /* Final Screen */
+    .final-card {
+      display: none;
+      animation: fadeIn 0.8s forwards;
+    }
+
+    .instruction-box {
+      background: rgba(252, 63, 29, 0.1);
+      border: 1px dashed rgba(252, 63, 29, 0.5);
+      border-radius: 16px;
+      padding: 14px;
+      margin: 18px 0 24px;
+      font-size: 0.85rem;
+      color: #ffb8a8;
+      line-height: 1.4;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #fc3f1d;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    /* Error Shake Animation */
+    .shake {
+      animation: shake 0.4s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Экран ввода пароля -->
+  <div class="card" id="screen-password">
+    <div class="badge">Доступ ограничен</div>
+    <h1>Вход только для одного</h1>
+    <p class="subtitle">Введи наш секретный пароль или памятную дату, чтобы продолжить.</p>
+    <input type="password" id="pass-input" placeholder="Введите пароль..." autocomplete="off">
+    <button class="btn" onclick="checkPassword()">Открыть</button>
+  </div>
+
+  <!-- 2. Экран Квиза -->
+  <div class="card" id="screen-quiz" style="display: none;">
+    <div class="badge" id="quiz-step">Вопрос 1 из 3</div>
+    <h2 id="quiz-question">Вопрос</h2>
+    <div class="options-grid" id="quiz-options"></div>
+  </div>
+
+  <!-- 3. Финальный экран -->
+  <div class="card final-card" id="screen-final">
+    <div style="font-size: 3rem; margin-bottom: 8px;">✨</div>
+    <h1>Ты прошёл!</h1>
+    <p class="subtitle">Твой подарок собран и ждёт тебя внутри Яндекс Музыки.</p>
+    
+    <div class="instruction-box">
+      <strong>⚠️ Важно:</strong><br>
+      Перед тем как нажать Play, прочитай названия всех треков по порядку сверху вниз.
+    </div>
+
+    <!-- Вставь свою ссылку на плейлист в href -->
+    <a href="https://music.yandex.ru/users/..." target="_blank" class="btn" style="text-align: center;">
+      Слушать плейлист 🎧
+    </a>
+  </div>
+
+  <script>
+    // 1. Пароль доступа (измени на ваш личный: например, дату, кличку или слово)
+    const SECRET_PASSWORD = "1234";
+
+    // 2. Вопросы квиза (добавь свои варианты и укажи индекс правильного ответа correct: 0, 1 или 2)
+    const quizData = [
+      {
+        question: "Где мы впервые встретились?",
+        options: ["В парке", "В универе / кафе", "В интернете"],
+        correct: 1
+      },
+      {
+        question: "Кто из нас дольше собирается?",
+        options: ["Ты", "Я", "Оба хороши"],
+        correct: 0
+      },
+      {
+        question: "Какое блюдо мы готовы есть вечно?",
+        options: ["Пиццу / роллы", "Бургеры", "Домашнюю пасту"],
+        correct: 0
+      }
+    ];
+
+    let currentQuestion = 0;
+
+    function checkPassword() {
+      const input = document.getElementById("pass-input");
+      const card = document.getElementById("screen-password");
+
+      if (input.value.trim().toLowerCase() === SECRET_PASSWORD.toLowerCase()) {
+        card.style.display = "none";
+        document.getElementById("screen-quiz").style.display = "block";
+        loadQuestion();
+      } else {
+        card.classList.add("shake");
+        input.value = "";
+        setTimeout(() => card.classList.remove("shake"), 400);
+      }
+    }
+
+    function loadQuestion() {
+      const q = quizData[currentQuestion];
+      document.getElementById("quiz-step").innerText = `Вопрос ${currentQuestion + 1} из ${quizData.length}`;
+      document.getElementById("quiz-question").innerText = q.question;
+
+      const optContainer = document.getElementById("quiz-options");
+      optContainer.innerHTML = "";
+
+      q.options.forEach((optText, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "opt-btn";
+        btn.innerText = optText;
+        btn.onclick = () => handleAnswer(idx, btn);
+        optContainer.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(selectedIndex, buttonEl) {
+      if (selectedIndex === quizData[currentQuestion].correct) {
+        currentQuestion++;
+        if (currentQuestion < quizData.length) {
+          loadQuestion();
+        } else {
+          finishQuiz();
+        }
+      } else {
+        buttonEl.classList.add("wrong");
+        setTimeout(() => buttonEl.classList.remove("wrong"), 600);
+      }
+    }
+
+    function finishQuiz() {
+      document.getElementById("screen-quiz").style.display = "none";
+      const finalScreen = document.getElementById("screen-final");
+      finalScreen.style.display = "block";
+
+      // Праздничный салют конфетти
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+  </script>
+</body>
+</html>
