@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Secret Track 🎧</title>
+  <title>🎧</title>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     * {
@@ -168,7 +168,7 @@
   <!-- 1. Экран ввода пароля -->
   <div class="card" id="screen-password">
     <div class="badge">Доступ ограничен</div>
-    <h1>Вход только для одного</h1>
+    <h1>хохоохохоо</h1>
     <p class="subtitle">Введи наш секретный пароль или памятную дату, чтобы продолжить.</p>
     <input type="password" id="pass-input" placeholder="Введите пароль..." autocomplete="off">
     <button class="btn" onclick="checkPassword()">Открыть</button>
@@ -193,32 +193,42 @@
     </div>
 
     <!-- Вставь свою ссылку на плейлист в href -->
-    <a href="https://music.yandex.ru/users/..." target="_blank" class="btn" style="text-align: center;">
+    <a href="https://music.yandex.ru/playlists/43fdc46c-56bd-63e3-8a84-62814f7f783a?utm_source=desktop&utm_medium=copy_link" target="_blank" class="btn" style="text-align: center;">
       Слушать плейлист 🎧
     </a>
   </div>
 
   <script>
     // 1. Пароль доступа (измени на ваш личный: например, дату, кличку или слово)
-    const SECRET_PASSWORD = "1234";
+    const SECRET_PASSWORD = "2309";
 
     // 2. Вопросы квиза (добавь свои варианты и укажи индекс правильного ответа correct: 0, 1 или 2)
     const quizData = [
       {
         question: "Где мы впервые встретились?",
-        options: ["В парке", "В универе / кафе", "В интернете"],
+        options: ["В парке", "В мечтах", "В лесу"],
+        correct: 0
+      },
+      {
+        question: "Как я тебя называю чаще всего?",
+        options: ["зайка", "котя", "егор"],
+        correct: 0
+      },
+      {
+        question: "Какое блюдо мы готовили вместе?",
+        options: ["Пиццу", "Бургеры", "Домашнюю пасту"],
+        correct: 2
+      },
+       {
+        question: "Как меня зовут)?",
+        options: ["КОТ", "Фидель", "Федя"],
         correct: 1
       },
-      {
-        question: "Кто из нас дольше собирается?",
-        options: ["Ты", "Я", "Оба хороши"],
-        correct: 0
-      },
-      {
-        question: "Какое блюдо мы готовы есть вечно?",
-        options: ["Пиццу / роллы", "Бургеры", "Домашнюю пасту"],
-        correct: 0
-      }
+       {
+        question: "а вот тут немного интереснее если с первого раза случайно жмякнешь куда надо то у тебя будет билет на одно желание любое",
+        options: ["хохохо", "хохо", "пупупупу"],
+        correct: 1
+      }  
     ];
 
     let currentQuestion = 0;
